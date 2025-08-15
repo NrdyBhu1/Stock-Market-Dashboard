@@ -43,7 +43,7 @@ app = FastAPI(lifespan=lifespan)
 
 @app.get("/")
 def read_root():
-    return {"Hello": "World"}
+    return {"Companies": companies}
 
 @app.get("/{company_data}")
 def read_item(company_data: str, records: str = "10"):
