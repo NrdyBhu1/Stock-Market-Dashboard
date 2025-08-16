@@ -1,6 +1,7 @@
 from typing import Union
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from psycopg2 import sql
 import psycopg2
 import psycopg2.extras
@@ -9,6 +10,10 @@ import os
 
 companies = ["META", "MSFT", "AMZN", "NVDA", "GOOG", "AAPL", "TSLA", "INTC", "UNH", "MSI"]
 market_data = {}
+origins = [
+    "http://localhost",
+    "http://localhost:5173"
+]
 
 def get_connection():
     try:
@@ -40,6 +45,13 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(lifespan=lifespan)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def read_root():

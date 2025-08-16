@@ -1,35 +1,44 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from 'react';
+import './App.css';
+import axios from 'axios';
 
-function App() {
-  const [count, setCount] = useState(0)
+class App extends React.Component {
+  constructor() {
+    super()
+    this.state = {
+      companies: [],
+      market_data: {},
+    }
+  }
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+  async componentDidMount() {
+    const URI = `http://${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}/`;
+    let cached_data = {}
+    // load companies
+    let res = await axios.get(URI);
+    let companies = res.data.Companies;
+    // load data
+    companies.map(async c => {
+      let company_res = await axios.get(`${URI}${c}`)
+      cached_data[c] = company_res.data.data;
+    })
+
+    this.setState({ companies: [...companies], market_data: cached_data })
+  }
+
+  render() {
+    return (<div>
+        <h1>Companies</h1>
+        <ul>
+        {this.state.companies.map((c, i) => (
+          <li key={i}>
+          {c} - {JSON.stringify(this.state.market_data[0])}
+          {console.log(this.state.market_data[c])}
+          </li>
+        ))}
+        </ul>
+      </div>)
+  }
 }
 
 export default App
