@@ -1,7 +1,10 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Depends, HTTPException, Security
+from fastapi import FastAPI, Depends, HTTPException, Security, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security.api_key import APIKeyHeader
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 from psycopg2 import sql
 import yfinance as yf
 import psycopg2
@@ -111,6 +114,7 @@ async def lifespan(app: FastAPI):
     yield
     conn.close()
 
+limiter = Limiter(key_func=get_remote_address)
 app = FastAPI(lifespan=lifespan, openapi_url=None)
 app.add_middleware(
     CORSMiddleware,
@@ -119,13 +123,18 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 @app.get("/")
-def read_root(api_key: str = Depends(get_api_key)):
+@limiter.limit("100/minute")
+def read_root(request: Request, api_key: str = Depends(get_api_key)):
     return {"Companies": companies}
 
+
 @app.get("/company/{company_data}")
-def read_item(company_data: str, records: str = "10", api_key: str = Depends(get_api_key)):
+@limiter.limit("100/minute")
+def read_item(request: Request, company_data: str, records: str = "10", api_key: str = Depends(get_api_key)):
     if company_data not in companies:
         return {"status": "failure"}
 
@@ -141,7 +150,8 @@ def read_item(company_data: str, records: str = "10", api_key: str = Depends(get
     return {"status": "success", "data": data}
 
 @app.get("/refresh_data")
-def refresh_mdata(api_key: str = Depends(get_api_key)):
+@limiter.limit("10/day")
+def refresh_mdata(request: Request, api_key: str = Depends(get_api_key)):
     res = get_data()
     if res:
         update_data()

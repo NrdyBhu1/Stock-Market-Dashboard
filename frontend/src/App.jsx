@@ -56,8 +56,6 @@ class App extends React.Component {
 			value: 0,
 		}
 
-		console.log(import.meta.env.VITE_API_KEY)
-
 		this.api = axios.create({
 			baseURL: import.meta.env.VITE_BACKEND_URI,
 			headers: {
