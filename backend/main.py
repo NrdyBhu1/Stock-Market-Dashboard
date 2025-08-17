@@ -12,10 +12,6 @@ companies = ["META", "MSFT", "AMZN", "NVDA", "GOOG", "AAPL", "TSLA", "INTC", "UN
 conn = None
 cur = None
 market_data = {}
-origins = [
-    "http://localhost",
-    "http://localhost:5173"
-]
 
 def get_connection():
     try:
@@ -103,6 +99,7 @@ async def lifespan(app: FastAPI):
     conn = get_connection()
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     create_tables()
+    get_data()
     update_data()
     yield
     conn.close()
@@ -110,7 +107,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan, openapi_url=None)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

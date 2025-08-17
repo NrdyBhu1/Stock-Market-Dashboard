@@ -1,4 +1,4 @@
-FROM node:alpine
+FROM node:alpine AS build
 
 WORKDIR /app
 
@@ -8,4 +8,11 @@ RUN npm install .
 
 COPY . .
 
-CMD ["npm", "run", "build"]
+RUN npm run build   # creates production-ready build in /app/build or /app/dist
+
+FROM nginx:alpine
+
+COPY --from=build /app/dist /usr/share/nginx/html
+
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

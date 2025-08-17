@@ -1,11 +1,12 @@
-FROM ghcr.io/astral-sh/uv:alpine
+FROM python:alpine
 
 WORKDIR /app
 
-COPY uv.lock pyproject.toml ./
+COPY pyproject.toml ./
 
-RUN uv pip install .
+RUN pip install .
 
 COPY . .
 
-CMD ["uvicorn", "main:app", "--port", "5000"]
+EXPOSE 5000
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000"]

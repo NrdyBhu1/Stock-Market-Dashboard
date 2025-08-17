@@ -62,9 +62,8 @@ class App extends React.Component {
 	}
 
 	async componentDidMount() {
-		const URI = `http://${import.meta.env.VITE_BACKEND_HOST}:${
-			import.meta.env.VITE_BACKEND_PORT
-		}`
+		const URI = import.meta.env.VITE_BACKEND_URI
+		console.log(URI)
 		let cached_data = {}
 		// load companies
 		let res = await axios.get(URI)
