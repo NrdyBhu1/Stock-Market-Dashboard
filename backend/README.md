@@ -38,8 +38,7 @@ Create a `.env` file from the `example.env` in the project root:
 
 ```env
 API_KEY=your_secret_api_key
-BACKEND_HOST=localhost
-BACKEND_PORT=5000
+DATABASE_URI=localhost
 ```
 
 ---

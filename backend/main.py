@@ -29,13 +29,7 @@ def get_api_key(api_key_header: str = Security(api_key_header)):
 
 def get_connection():
     try:
-        return psycopg2.connect(
-            database=os.getenv("DATABASE"),
-            user=os.getenv("DBUSER"),
-            password=os.getenv("DBPSWD"),
-            host=os.getenv("HOST"),
-            port=os.getenv("PORT")
-        )
+        return psycopg2.connect(os.getenv("DATABASE_URI"))
     except Exception as e:
         print(e)
         return False
