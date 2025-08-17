@@ -64,14 +64,14 @@ class App extends React.Component {
 	async componentDidMount() {
 		const URI = `http://${import.meta.env.VITE_BACKEND_HOST}:${
 			import.meta.env.VITE_BACKEND_PORT
-		}/`
+		}`
 		let cached_data = {}
 		// load companies
 		let res = await axios.get(URI)
 		let companies = res.data.Companies
 		// load data
 		for (const c of companies) {
-			let company_res = await axios.get(`${URI}${c}`)
+			let company_res = await axios.get(`${URI}/company/${c}`)
 			cached_data[c] = company_res.data.data
 		}
 
@@ -116,7 +116,7 @@ class App extends React.Component {
 					{
 						companies.map((c, i) => (
 							<TabPanel key={`tabpanel-${c}`} value={value} index={i}>
-								<Line width={900} height={450} data={{ labels: market_data[c].map((row) => row.mdate), datasets: [{ label: c, data: market_data[c].map((row) => row.close), borderColor: "#2196f3", borderWidth: 2 }] }} />
+								<Line width={900} height={450} data={{ labels: market_data[c].map((row) => row.mdate).reverse(), datasets: [{ label: c, data: market_data[c].map((row) => row.close), borderColor: "#2196f3", borderWidth: 2 }] }} />
 							</TabPanel>
 						))
 					}
