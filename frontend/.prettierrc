@@ -1,0 +1,10 @@
+{
+	"tabWidth": 4,
+	"useTabs": true,
+	"semi": false,
+	"singleQuote": false,
+	"bracketSpacing": true,
+	"objectWrap": "collapse",
+	"bracketSameLine": true,
+	"arrowParens": "always"
+}
