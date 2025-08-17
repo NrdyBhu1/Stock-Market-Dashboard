@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, HTTPException, Security
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security.api_key import APIKeyHeader
 from psycopg2 import sql
 import yfinance as yf
 import psycopg2
@@ -13,14 +14,27 @@ conn = None
 cur = None
 market_data = {}
 
+
+dotenv.load_dotenv() 
+
+API_KEY = os.getenv("API_KEY")
+API_KEY_NAME = "access_token"
+api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
+
+def get_api_key(api_key_header: str = Security(api_key_header)):
+    if api_key_header == API_KEY:
+        return api_key_header
+    else:
+        raise HTTPException(status_code=403, detail="Invalid or missing API Key")
+
 def get_connection():
     try:
         return psycopg2.connect(
-            database=os.environ["DATABASE"],
-            user=os.environ["DBUSER"],
-            password=os.environ["DBPSWD"],
-            host=os.environ["HOST"],
-            port=os.environ["PORT"]
+            database=os.getenv("DATABASE"),
+            user=os.getenv("DBUSER"),
+            password=os.getenv("DBPSWD"),
+            host=os.getenv("HOST"),
+            port=os.getenv("PORT")
         )
     except Exception as e:
         print(e)
@@ -94,7 +108,6 @@ def update_data():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    dotenv.load_dotenv()
     global conn,cur
     conn = get_connection()
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -114,21 +127,27 @@ app.add_middleware(
 )
 
 @app.get("/")
-def read_root():
+def read_root(api_key: str = Depends(get_api_key)):
     return {"Companies": companies}
 
 @app.get("/company/{company_data}")
-def read_item(company_data: str, records: str = "10"):
+def read_item(company_data: str, records: str = "10", api_key: str = Depends(get_api_key)):
+    if company_data not in companies:
+        return {"status": "failure"}
+
+    if int(records) <= 0:
+        return {"status": "failure"}
+
     if records.isdigit():
         data = market_data[company_data][0:int(records)]
     elif records.lower() == "max":
         data = market_data[company_data]
     else:
         data = market_data[company_data][0:10]
-    return {"data": data}
+    return {"status": "success", "data": data}
 
 @app.get("/refresh_data")
-def refresh_mdata():
+def refresh_mdata(api_key: str = Depends(get_api_key)):
     res = get_data()
     if res:
         update_data()

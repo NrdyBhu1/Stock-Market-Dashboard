@@ -55,22 +55,31 @@ class App extends React.Component {
 			market_data: {},
 			value: 0,
 		}
+
+		console.log(import.meta.env.VITE_API_KEY)
+
+		this.api = axios.create({
+			baseURL: import.meta.env.VITE_BACKEND_URI,
+			headers: {
+				access_token: import.meta.env.VITE_API_KEY,
+			}
+		});
+
 	}
 
 	handleChange = (event, newValue) => {
 		this.setState({ value: newValue })
 	}
 
+
 	async componentDidMount() {
-		const URI = import.meta.env.VITE_BACKEND_URI
-		console.log(URI)
 		let cached_data = {}
 		// load companies
-		let res = await axios.get(URI)
+		let res = await this.api.get("/")
 		let companies = res.data.Companies
 		// load data
 		for (const c of companies) {
-			let company_res = await axios.get(`${URI}/company/${c}`)
+			let company_res = await this.api.get(`/company/${c}`)
 			cached_data[c] = company_res.data.data
 		}
 
