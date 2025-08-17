@@ -107,7 +107,7 @@ async def lifespan(app: FastAPI):
     yield
     conn.close()
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(lifespan=lifespan, openapi_url=None)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
