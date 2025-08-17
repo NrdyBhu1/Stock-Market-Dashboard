@@ -62,7 +62,8 @@ class App extends React.Component {
 			baseURL: import.meta.env.VITE_BACKEND_URI,
 			headers: {
 				access_token: import.meta.env.VITE_API_KEY,
-			}
+			},
+			withCredentials: false,
 		});
 
 	}
