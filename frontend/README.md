@@ -20,7 +20,7 @@ clean, interactive dashboard.
 
 ### Install dependencies
 
-``` bash
+```bash
 npm install
 ```
 
@@ -28,14 +28,14 @@ npm install
 
 Create a `.env` file from the `example.env` in the root of the frontend project:
 
-``` env
+```env
 VITE_BACKEND_URI=http://localhost:5000
 VITE_API_KEY=your_api_key_here
 ```
 
 ### Run the development server
 
-``` bash
+```bash
 npm run dev
 ```
 
@@ -54,7 +54,7 @@ backend.
 
 ## Build for Production
 
-``` bash
+```bash
 npm run build
 ```
 

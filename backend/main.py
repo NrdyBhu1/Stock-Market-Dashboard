@@ -118,7 +118,7 @@ limiter = Limiter(key_func=get_remote_address)
 app = FastAPI(lifespan=lifespan, openapi_url=None)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://sample-stock-market-data.netlify.app", "*"],
+    allow_origins=["https://sample-stock-market-data.netlify.app", "http://localhost:5173", "*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -138,10 +138,9 @@ def read_item(request: Request, company_data: str, records: str = "10", api_key:
     if company_data not in companies:
         return {"status": "failure"}
 
-    if int(records) <= 0:
-        return {"status": "failure"}
-
     if records.isdigit():
+        if int(records) <= 0:
+            return {"status": "failure"}
         data = market_data[company_data][0:int(records)]
     elif records.lower() == "max":
         data = market_data[company_data]
