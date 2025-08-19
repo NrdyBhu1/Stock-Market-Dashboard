@@ -123,6 +123,11 @@ class App extends React.Component {
 			return <div>Loading...</div>
 		}
 
+		// { open, high, low, close, volume }
+		Object.keys(actual_data).map((cname) => {
+			actual_data[cname] = actual_data[cname].reverse()
+		})
+
 		return (
 			<div>
 				<h1>Stock Market Dashboard</h1>
@@ -173,19 +178,49 @@ class App extends React.Component {
 								width={900}
 								height={450}
 								data={{
-									labels: actual_data[c]
-										.map((row) => row.mdate)
-										.reverse(),
+									labels: actual_data[c].map(
+										(row) => row.mdate
+									),
 									datasets: [
 										{
-											label: c,
+											label: "Close",
 											data: actual_data[c].map(
 												(row) => row.close
 											),
 											borderColor: "#2196f3",
 											borderWidth: 2,
 											pointRadius: 0,
-											pointHoverRadius: 0,
+											pointHoverRadius: 4,
+										},
+										{
+											label: "Open",
+											data: actual_data[c].map(
+												(row) => row.open
+											),
+											borderColor: "#c6ff00",
+											borderWidth: 2,
+											pointRadius: 0,
+											pointHoverRadius: 4,
+										},
+										{
+											label: "High",
+											data: actual_data[c].map(
+												(row) => row.high
+											),
+											borderColor: "#00e676",
+											borderWidth: 2,
+											pointRadius: 0,
+											pointHoverRadius: 4,
+										},
+										{
+											label: "Low",
+											data: actual_data[c].map(
+												(row) => row.low
+											),
+											borderColor: "#f50057",
+											borderWidth: 2,
+											pointRadius: 0,
+											pointHoverRadius: 4,
 										},
 									],
 								}}
